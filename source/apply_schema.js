@@ -12,29 +12,28 @@ function get_field(property, library) {
         }
         if (type === library.types.String) {
             return {
-                type: Sequelize.INTEGER,
+                type: Sequelize.STRING,
                 nullable: false
             };
         }
-        throw Error("Not implemented or supported");
     }
-    function apply_schema(schema, sequelize) {
-        for (var name_1 in schema.trellises) {
-            var trellis = schema.trellises[name_1];
-            var fields = {};
-            for (var i in trellis.properties) {
-                fields[i] = get_field(trellis.properties[i], schema.library);
-            }
-            trellis.table = sequelize.define(trellis.name, fields, {
-                underscored: true,
-                createdAt: 'created',
-                updatedAt: 'modified',
-            });
-        }
-        for (var name_2 in schema.trellises) {
-            var trellis = schema.trellises[name_2];
-        }
-    }
-    exports.apply_schema = apply_schema;
+    throw Error("Not implemented or supported");
 }
-//# sourceMappingURL=apply_schema.js.map
+function apply_schema(schema, sequelize) {
+    for (var name_1 in schema.trellises) {
+        var trellis = schema.trellises[name_1];
+        var fields = {};
+        for (var i in trellis.properties) {
+            fields[i] = get_field(trellis.properties[i], schema.library);
+        }
+        trellis.table = sequelize.define(trellis.name, fields, {
+            underscored: true,
+            createdAt: 'created',
+            updatedAt: 'modified',
+        });
+    }
+    for (var name_2 in schema.trellises) {
+        var trellis = schema.trellises[name_2];
+    }
+}
+exports.apply_schema = apply_schema;

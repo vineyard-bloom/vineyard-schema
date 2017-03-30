@@ -1,11 +1,7 @@
 "use strict";
-var scheming = require('./scheming');
-exports.scheming = scheming;
-var apply_schema_1 = require("./apply_schema");
-function initialize(schema, db) {
-    // const definitions = scheming.get_definitions(bushel.schema)
-    // const models = vineyard_mongoose.define_schema(definitions)
-    apply_schema_1.apply_schema(schema, db);
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-exports.initialize = initialize;
+__export(require('./scheming'));
+__export(require('./database'));
 //# sourceMappingURL=index.js.map
