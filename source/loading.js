@@ -1,20 +1,25 @@
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var trellis_1 = require("./trellis");
-var Library = (function () {
-    function Library() {
-        this.types = {
-            bool: new trellis_1.Primitive('bool'),
-            date: new trellis_1.Primitive('date'),
-            float: new trellis_1.Primitive('float'),
-            guid: new trellis_1.Primitive('guid'),
-            json: new trellis_1.Primitive('json'),
-            int: new trellis_1.Primitive('int'),
-            string: new trellis_1.Primitive('string'),
-        };
+var Incomplete_Type = (function (_super) {
+    __extends(Incomplete_Type, _super);
+    function Incomplete_Type(target_name, source) {
+        _super.call(this, "Incomplete: " + target_name);
+        this.target_name = target_name;
+        this.source = source;
     }
-    return Library;
-}());
-exports.Library = Library;
+    Incomplete_Type.prototype.get_category = function () {
+        return trellis_1.Type_Category.incomplete;
+    };
+    Incomplete_Type.prototype.get_other_trellis_name = function () {
+        return this.target_name;
+    };
+    return Incomplete_Type;
+}(trellis_1.Type));
 var Loader = (function () {
     function Loader(library) {
         this.incomplete = {};
@@ -22,7 +27,6 @@ var Loader = (function () {
     }
     return Loader;
 }());
-exports.Loader = Loader;
 function load_type(source, loader) {
     var types = loader.library.types;
     var result = types[source.type];
@@ -32,9 +36,9 @@ function load_type(source, loader) {
         var result_1 = types[source.trellis];
         if (result_1)
             return new trellis_1.List_Type(result_1.name, result_1);
-        return new trellis_1.Incomplete_Type(source.trellis, source);
+        return new Incomplete_Type(source.trellis, source);
     }
-    return new trellis_1.Incomplete_Type(source.type, source);
+    return new Incomplete_Type(source.type, source);
     // throw Error("Not supported: " + JSON.stringify(source))
 }
 function find_other_references(trellis, other_trellis) {
@@ -118,5 +122,15 @@ function load_trellis(name, source, loader) {
     update_incomplete(trellis, loader);
     return trellis;
 }
-exports.load_trellis = load_trellis;
+function load_schema(definitions, trellises, library) {
+    var loader = new Loader(library);
+    for (var name_3 in definitions) {
+        var definition = definitions[name_3];
+        trellises[name_3] = load_trellis(name_3, definition, loader);
+    }
+    for (var a in loader.incomplete) {
+        throw Error("Unknown type '" + a + "'.");
+    }
+}
+exports.load_schema = load_schema;
 //# sourceMappingURL=loading.js.map

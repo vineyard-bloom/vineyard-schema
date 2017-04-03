@@ -27,13 +27,6 @@ export declare class List_Type extends Type {
     get_category(): Type_Category;
     get_other_trellis_name(): string;
 }
-export declare class Incomplete_Type extends Type {
-    target_name: string;
-    source: any;
-    constructor(target_name: string, source: any);
-    get_category(): Type_Category;
-    get_other_trellis_name(): string;
-}
 export declare class Property {
     name: string;
     type: Type;

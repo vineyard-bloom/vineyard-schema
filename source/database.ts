@@ -1,5 +1,5 @@
 import {Property, Type_Category, Reference, Trellis_Type, Trellis} from "./trellis"
-import {Library} from "./loading"
+import {Library} from "./library"
 import {Schema} from "./scheming"
 import * as Sequelize from 'sequelize'
 
@@ -120,4 +120,3 @@ export function vineyard_to_sequelize(schema: Schema, sequelize) {
     }
   }
 }
-

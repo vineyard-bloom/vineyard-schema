@@ -30,7 +30,6 @@ export class Primitive extends Type {
   get_other_trellis_name(): string {
     throw Error("Primitive types do not point to a trellis.")
   }
-
 }
 
 export class Trellis_Type extends Type {
@@ -64,25 +63,6 @@ export class List_Type extends Type {
 
   get_other_trellis_name(): string {
     return this.child_type.get_other_trellis_name()
-  }
-}
-
-export class Incomplete_Type extends Type {
-  target_name: string
-  source
-
-  constructor(target_name: string, source) {
-    super("Incomplete: " + target_name)
-    this.target_name = target_name
-    this.source = source
-  }
-
-  get_category(): Type_Category {
-    return Type_Category.incomplete
-  }
-
-  get_other_trellis_name(): string {
-    return this.target_name
   }
 }
 

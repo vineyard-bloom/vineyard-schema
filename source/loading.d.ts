@@ -1,11 +1,18 @@
+import { Library } from './library';
 import { Trellis } from "./trellis";
-export declare class Library {
-    types: any;
-    constructor();
+export interface Property_Source {
+    type: string;
+    trellis?: string;
+    nullable?: boolean;
 }
-export declare class Loader {
-    incomplete: {};
-    library: Library;
-    constructor(library: Library);
+export interface Trellis_Source {
+    properties: {
+        [name: string]: Property_Source;
+    };
 }
-export declare function load_trellis(name: string, source: any, loader: Loader): Trellis;
+export declare type Schema_Source = {
+    [name: string]: Trellis_Source;
+};
+export declare function load_schema(definitions: Schema_Source, trellises: {
+    [name: string]: Trellis;
+}, library: Library): void;

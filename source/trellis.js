@@ -62,22 +62,6 @@ var List_Type = (function (_super) {
     return List_Type;
 }(Type));
 exports.List_Type = List_Type;
-var Incomplete_Type = (function (_super) {
-    __extends(Incomplete_Type, _super);
-    function Incomplete_Type(target_name, source) {
-        _super.call(this, "Incomplete: " + target_name);
-        this.target_name = target_name;
-        this.source = source;
-    }
-    Incomplete_Type.prototype.get_category = function () {
-        return Type_Category.incomplete;
-    };
-    Incomplete_Type.prototype.get_other_trellis_name = function () {
-        return this.target_name;
-    };
-    return Incomplete_Type;
-}(Type));
-exports.Incomplete_Type = Incomplete_Type;
 var Property = (function () {
     function Property(name, type, trellis) {
         this.nullable = false;

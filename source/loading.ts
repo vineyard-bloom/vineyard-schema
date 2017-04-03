@@ -1,8 +1,7 @@
+import {Library} from './library'
 import {
-  Primitive,
   Trellis,
   Type,
-  Incomplete_Type,
   Reference,
   Property,
   Type_Category,
@@ -10,24 +9,46 @@ import {
   List_Type
 } from "./trellis"
 
-export class Library {
-  types
+class Incomplete_Type extends Type {
+  target_name: string
+  source
 
-  constructor() {
-    this.types = {
-      bool: new Primitive('bool'),
-      date: new Primitive('date'),
-      float: new Primitive('float'),
-      guid: new Primitive('guid'),
-      json: new Primitive('json'),
-      int: new Primitive('int'),
-      string: new Primitive('string'),
-    }
+  constructor(target_name: string, source) {
+    super("Incomplete: " + target_name)
+    this.target_name = target_name
+    this.source = source
+  }
+
+  get_category(): Type_Category {
+    return Type_Category.incomplete
+  }
+
+  get_other_trellis_name(): string {
+    return this.target_name
   }
 }
 
-export class Loader {
-  incomplete = {}
+export interface Property_Source {
+  type: string
+  trellis?: string
+  nullable?: boolean
+}
+
+export interface Trellis_Source {
+  properties: {[name: string]: Property_Source}
+}
+
+export type Schema_Source = {[name: string]: Trellis_Source}
+
+interface Incomplete_Reference {
+  property: Property
+  source: Property_Source
+}
+
+type Incomplete_Map = {[trellis_name: string]: Incomplete_Reference[]}
+
+class Loader {
+  incomplete: Incomplete_Map = {}
   library: Library
 
   constructor(library: Library) {
@@ -35,7 +56,7 @@ export class Loader {
   }
 }
 
-function load_type(source, loader: Loader): Type {
+function load_type(source: Property_Source, loader: Loader): Type {
   const types = loader.library.types
 
   const result = types[source.type]
@@ -83,7 +104,7 @@ function find_other_reference(trellis: Trellis, other_trellis: Trellis): Referen
   return reference
 }
 
-function load_property(name: string, source, trellis: Trellis, loader: Loader): Property {
+function load_property(name: string, source: Property_Source, trellis: Trellis, loader: Loader): Property {
   const type = load_type(source, loader)
   if (type.get_category() == Type_Category.primitive) {
     return new Property(name, type, trellis)
@@ -117,10 +138,10 @@ function update_incomplete(trellis: Trellis, loader: Loader) {
         throw Error("Error resolving incomplete type.")
 
       if (type.get_category() == Type_Category.trellis) {
-        property.other_property = find_other_reference_or_null(property.trellis, trellis)
+        (property as Reference).other_property = find_other_reference_or_null(property.trellis, trellis)
       }
       else {
-        property.other_property = find_other_reference(property.trellis, trellis)
+        (property as Reference).other_property = find_other_reference(property.trellis, trellis)
       }
     }
     delete loader.incomplete[trellis.name]
@@ -128,7 +149,7 @@ function update_incomplete(trellis: Trellis, loader: Loader) {
 
 }
 
-export function load_trellis(name: string, source, loader: Loader): Trellis {
+function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
   const trellis = new Trellis(name)
   loader.library.types[name] = new Trellis_Type(name, trellis)
 
@@ -148,4 +169,17 @@ export function load_trellis(name: string, source, loader: Loader): Trellis {
   update_incomplete(trellis, loader)
 
   return trellis
+}
+
+export function load_schema(definitions: Schema_Source, trellises: {[name: string]: Trellis}, library: Library) {
+  const loader = new Loader(library)
+
+  for (let name in definitions) {
+    const definition = definitions [name]
+    trellises [name] = load_trellis(name, definition, loader)
+  }
+
+  for (let a in loader.incomplete) {
+    throw Error("Unknown type '" + a + "'.")
+  }
 }
