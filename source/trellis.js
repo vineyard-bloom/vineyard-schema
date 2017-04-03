@@ -26,6 +26,9 @@ var Primitive = (function (_super) {
     Primitive.prototype.get_category = function () {
         return Type_Category.primitive;
     };
+    Primitive.prototype.get_other_trellis_name = function () {
+        throw Error("Primitive types do not point to a trellis.");
+    };
     return Primitive;
 }(Type));
 exports.Primitive = Primitive;
@@ -38,6 +41,9 @@ var Trellis_Type = (function (_super) {
     Trellis_Type.prototype.get_category = function () {
         return Type_Category.trellis;
     };
+    Trellis_Type.prototype.get_other_trellis_name = function () {
+        return this.trellis.name;
+    };
     return Trellis_Type;
 }(Type));
 exports.Trellis_Type = Trellis_Type;
@@ -49,6 +55,9 @@ var List_Type = (function (_super) {
     }
     List_Type.prototype.get_category = function () {
         return Type_Category.list;
+    };
+    List_Type.prototype.get_other_trellis_name = function () {
+        return this.child_type.get_other_trellis_name();
     };
     return List_Type;
 }(Type));
@@ -63,11 +72,15 @@ var Incomplete_Type = (function (_super) {
     Incomplete_Type.prototype.get_category = function () {
         return Type_Category.incomplete;
     };
+    Incomplete_Type.prototype.get_other_trellis_name = function () {
+        return this.target_name;
+    };
     return Incomplete_Type;
 }(Type));
 exports.Incomplete_Type = Incomplete_Type;
 var Property = (function () {
     function Property(name, type, trellis) {
+        this.nullable = false;
         this.name = name;
         this.type = type;
         this.trellis = trellis;
@@ -76,7 +89,9 @@ var Property = (function () {
         return this.trellis.name + '.' + this.name;
     };
     Property.prototype.is_reference = function () {
-        return this.type.get_category() == Type_Category.trellis || this.type.get_category() == Type_Category.list;
+        return this.type.get_category() == Type_Category.trellis
+            || this.type.get_category() == Type_Category.list
+            || this.type.get_category() == Type_Category.incomplete;
     };
     return Property;
 }());
