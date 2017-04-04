@@ -8,13 +8,15 @@ function get_field(property: Property, library: Library): any {
   if (type.get_category() == Type_Category.primitive) {
     if (type === library.types.int) {
       return {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       }
     }
 
     if (type === library.types.string) {
       return {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue: ""
       }
     }
 
@@ -26,7 +28,8 @@ function get_field(property: Property, library: Library): any {
 
     if (type === library.types.bool) {
       return {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       }
     }
 
@@ -38,7 +41,8 @@ function get_field(property: Property, library: Library): any {
 
     if (type === library.types.float) {
       return {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
+        defaultValue: 0
       }
     }
 
@@ -85,6 +89,8 @@ function convert_relationship(property: Property, trellis: Trellis){
 }
 
 export function vineyard_to_sequelize(schema: Schema, sequelize) {
+  const result = {}
+
   for (let name in schema.trellises) {
     const trellis = schema.trellises [name]
     const fields = {}
@@ -92,6 +98,7 @@ export function vineyard_to_sequelize(schema: Schema, sequelize) {
     // Create the primary key field first for DB UX
     const primary_key = fields[trellis.primary_key.name] = create_field(trellis.primary_key, schema.library)
     primary_key.primaryKey = true
+    primary_key.defaultValue = Sequelize.UUIDV4
 
     for (let i in trellis.properties) {
       if (i == trellis.primary_key.name)
@@ -104,7 +111,7 @@ export function vineyard_to_sequelize(schema: Schema, sequelize) {
       }
     }
 
-    trellis.table = sequelize.define(trellis.name, fields, {
+    trellis.table = result [trellis.name] = sequelize.define(trellis.name, fields, {
       underscored: true,
       createdAt: 'created',
       updatedAt: 'modified',
@@ -119,4 +126,6 @@ export function vineyard_to_sequelize(schema: Schema, sequelize) {
       convert_relationship(property, trellis)
     }
   }
+
+  return result
 }
