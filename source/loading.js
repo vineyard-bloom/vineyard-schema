@@ -112,8 +112,9 @@ function load_trellis(name, source, loader) {
     for (var name_2 in source.properties) {
         var property_source = source.properties[name_2];
         var property = trellis.properties[name_2] = load_property(name_2, property_source, trellis, loader);
-        if (property_source.nullable == true)
-            property_source.nullable = true;
+        if (property_source.nullable === true)
+            property.nullable = true;
+        property.default = property_source.default;
     }
     if (!trellis.properties['id']) {
         trellis.properties['id'] = new trellis_1.Property('id', loader.library.types.guid, trellis);

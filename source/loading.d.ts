@@ -4,6 +4,7 @@ export interface Property_Source {
     type: string;
     trellis?: string;
     nullable?: boolean;
+    "default"?: any;
 }
 export interface Trellis_Source {
     properties: {

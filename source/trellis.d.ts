@@ -32,6 +32,7 @@ export declare class Property {
     type: Type;
     trellis: Trellis;
     nullable: boolean;
+    "default": any;
     constructor(name: string, type: Type, trellis: Trellis);
     get_path(): string;
     is_reference(): boolean;
@@ -46,7 +47,6 @@ export declare class Trellis {
     properties: {
         [name: string]: Property;
     };
-    table: any;
     primary_key: Property;
     constructor(name: string);
 }

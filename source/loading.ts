@@ -32,6 +32,7 @@ export interface Property_Source {
   type: string
   trellis?: string
   nullable?: boolean
+  "default"?:  any
 }
 
 export interface Trellis_Source {
@@ -156,8 +157,10 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
   for (let name in source.properties) {
     const property_source = source.properties [name]
     const property = trellis.properties [name] = load_property(name, property_source, trellis, loader)
-    if (property_source.nullable == true)
-      property_source.nullable = true
+    if (property_source.nullable === true)
+      property.nullable = true
+
+    property.default = property_source.default
   }
 
   if (!trellis.properties['id']) {

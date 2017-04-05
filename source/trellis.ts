@@ -71,6 +71,7 @@ export class Property {
   type: Type
   trellis: Trellis
   nullable: boolean = false
+  "default": any
 
   constructor(name: string, type: Type, trellis: Trellis) {
     this.name = name
@@ -107,7 +108,6 @@ export class Reference extends Property {
 export class Trellis {
   name: string
   properties: {[name: string]: Property} = {}
-  table
   primary_key: Property
 
   constructor(name: string) {
