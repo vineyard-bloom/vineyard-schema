@@ -117,7 +117,7 @@ function load_trellis(name, source, loader) {
         property.default = property_source.default;
     }
     if (!trellis.properties['id']) {
-        trellis.properties['id'] = new trellis_1.Property('id', loader.library.types.guid, trellis);
+        trellis.properties['id'] = new trellis_1.Property('id', loader.library.types.uuid, trellis);
     }
     trellis.primary_key = trellis.properties['id'];
     update_incomplete(trellis, loader);

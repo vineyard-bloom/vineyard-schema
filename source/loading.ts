@@ -164,7 +164,7 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
   }
 
   if (!trellis.properties['id']) {
-    trellis.properties['id'] = new Property('id', loader.library.types.guid, trellis)
+    trellis.properties['id'] = new Property('id', loader.library.types.uuid, trellis)
   }
 
   trellis.primary_key = trellis.properties['id']
