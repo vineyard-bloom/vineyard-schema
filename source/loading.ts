@@ -1,12 +1,10 @@
+import {Type, Type_Category, List_Type} from './type'
 import {Library} from './library'
 import {
   Trellis,
-  Type,
   Reference,
   Property,
-  Type_Category,
   Trellis_Type,
-  List_Type
 } from "./trellis"
 
 class Incomplete_Type extends Type {
@@ -32,10 +30,12 @@ export interface Property_Source {
   type: string
   trellis?: string
   nullable?: boolean
-  "default"?:  any
+  "default"?: any
+  unique?: boolean
 }
 
 export interface Trellis_Source {
+  primary_key?: string
   properties: {[name: string]: Property_Source}
 }
 
@@ -105,7 +105,7 @@ function find_other_reference(trellis: Trellis, other_trellis: Trellis): Referen
   return reference
 }
 
-function load_property(name: string, source: Property_Source, trellis: Trellis, loader: Loader): Property {
+function load_property_inner(name: string, source: Property_Source, trellis: Trellis, loader: Loader): Property {
   const type = load_type(source, loader)
   if (type.get_category() == Type_Category.primitive) {
     return new Property(name, type, trellis)
@@ -114,7 +114,8 @@ function load_property(name: string, source: Property_Source, trellis: Trellis, 
     return new Reference(name, type, trellis, find_other_reference_or_null(trellis, (type as Trellis_Type).trellis))
   }
   else if (type.get_category() == Type_Category.list) {
-    return new Reference(name, type, trellis, find_other_reference(trellis, (type as Trellis_Type).trellis))
+    const list_type = type as List_Type
+    return new Reference(name, type, trellis, find_other_reference(trellis, (list_type.child_type as Trellis_Type).trellis))
   }
   else if (type.get_category() == Type_Category.incomplete) {
     const property = new Reference(name, type, trellis, null)
@@ -126,6 +127,18 @@ function load_property(name: string, source: Property_Source, trellis: Trellis, 
     })
     return property
   }
+}
+
+function load_property(name: string, property_source: Property_Source, trellis: Trellis, loader: Loader): Property {
+  const property = trellis.properties [name] = load_property_inner(name, property_source, trellis, loader)
+  if (property_source.nullable === true)
+    property.is_nullable = true
+
+  if(property_source.unique === true)
+    property.is_unique = true
+
+  property.default = property_source.default
+  return property
 }
 
 function update_incomplete(trellis: Trellis, loader: Loader) {
@@ -147,7 +160,18 @@ function update_incomplete(trellis: Trellis, loader: Loader) {
     }
     delete loader.incomplete[trellis.name]
   }
+}
 
+function initialize_primary_key(trellis: Trellis, source: Trellis_Source, loader: Loader) {
+  const primary_key = source.primary_key || 'id'
+
+  if (primary_key == 'id' && !trellis.properties['id'])
+    trellis.properties['id'] = new Property('id', loader.library.types.uuid, trellis)
+
+  if (!trellis.properties[primary_key])
+    throw new Error("Could not find primary key " + trellis.name + '.' + primary_key + '.')
+
+  trellis.primary_key = trellis.properties[primary_key]
 }
 
 function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
@@ -156,19 +180,10 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
 
   for (let name in source.properties) {
     const property_source = source.properties [name]
-    const property = trellis.properties [name] = load_property(name, property_source, trellis, loader)
-    if (property_source.nullable === true)
-      property.nullable = true
-
-    property.default = property_source.default
+    trellis.properties [name] = load_property(name, property_source, trellis, loader)
   }
 
-  if (!trellis.properties['id']) {
-    trellis.properties['id'] = new Property('id', loader.library.types.uuid, trellis)
-  }
-
-  trellis.primary_key = trellis.properties['id']
-
+  initialize_primary_key(trellis, source, loader)
   update_incomplete(trellis, loader)
 
   return trellis

@@ -1,19 +1,25 @@
 "use strict";
-var trellis_1 = require("./trellis");
+var type_1 = require("./type");
 var Library = (function () {
     function Library() {
-        var guid = new trellis_1.Primitive('guid');
+        var guid = new type_1.Primitive('guid');
         this.types = {
-            bool: new trellis_1.Primitive('bool'),
-            date: new trellis_1.Primitive('date'),
-            float: new trellis_1.Primitive('float'),
+            long: new type_1.Primitive('long'),
+            bool: new type_1.Primitive('bool'),
+            date: new type_1.Primitive('date'),
+            float: new type_1.Primitive('float'),
             guid: guid,
             uuid: guid,
-            json: new trellis_1.Primitive('json'),
-            int: new trellis_1.Primitive('int'),
-            string: new trellis_1.Primitive('string'),
+            json: new type_1.Primitive('json'),
+            int: new type_1.Primitive('int'),
+            string: new type_1.Primitive('string'),
         };
     }
+    Library.prototype.add_type = function (type) {
+        if (this.types[type.name])
+            throw new Error('Library already has a type named ' + type.name + '.');
+        this.types[type.name] = type;
+    };
     return Library;
 }());
 exports.Library = Library;

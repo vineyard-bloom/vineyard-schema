@@ -5,8 +5,10 @@ export interface Property_Source {
     trellis?: string;
     nullable?: boolean;
     "default"?: any;
+    unique?: boolean;
 }
 export interface Trellis_Source {
+    primary_key?: string;
     properties: {
         [name: string]: Property_Source;
     };

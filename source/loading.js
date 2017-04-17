@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var type_1 = require('./type');
 var trellis_1 = require("./trellis");
 var Incomplete_Type = (function (_super) {
     __extends(Incomplete_Type, _super);
@@ -13,13 +14,13 @@ var Incomplete_Type = (function (_super) {
         this.source = source;
     }
     Incomplete_Type.prototype.get_category = function () {
-        return trellis_1.Type_Category.incomplete;
+        return type_1.Type_Category.incomplete;
     };
     Incomplete_Type.prototype.get_other_trellis_name = function () {
         return this.target_name;
     };
     return Incomplete_Type;
-}(trellis_1.Type));
+}(type_1.Type));
 var Loader = (function () {
     function Loader(library) {
         this.incomplete = {};
@@ -35,7 +36,7 @@ function load_type(source, loader) {
     if (source.type == 'list') {
         var result_1 = types[source.trellis];
         if (result_1)
-            return new trellis_1.List_Type(result_1.name, result_1);
+            return new type_1.List_Type(result_1.name, result_1);
         return new Incomplete_Type(source.trellis, source);
     }
     return new Incomplete_Type(source.type, source);
@@ -65,18 +66,19 @@ function find_other_reference(trellis, other_trellis) {
         throw Error("Could not find other reference for " + trellis.name + " and " + other_trellis.name + ".");
     return reference;
 }
-function load_property(name, source, trellis, loader) {
+function load_property_inner(name, source, trellis, loader) {
     var type = load_type(source, loader);
-    if (type.get_category() == trellis_1.Type_Category.primitive) {
+    if (type.get_category() == type_1.Type_Category.primitive) {
         return new trellis_1.Property(name, type, trellis);
     }
-    else if (type.get_category() == trellis_1.Type_Category.trellis) {
+    else if (type.get_category() == type_1.Type_Category.trellis) {
         return new trellis_1.Reference(name, type, trellis, find_other_reference_or_null(trellis, type.trellis));
     }
-    else if (type.get_category() == trellis_1.Type_Category.list) {
-        return new trellis_1.Reference(name, type, trellis, find_other_reference(trellis, type.trellis));
+    else if (type.get_category() == type_1.Type_Category.list) {
+        var list_type = type;
+        return new trellis_1.Reference(name, type, trellis, find_other_reference(trellis, list_type.child_type.trellis));
     }
-    else if (type.get_category() == trellis_1.Type_Category.incomplete) {
+    else if (type.get_category() == type_1.Type_Category.incomplete) {
         var property = new trellis_1.Reference(name, type, trellis, null);
         var target = type.target_name;
         var incomplete = loader.incomplete[target] = loader.incomplete[target] || [];
@@ -87,6 +89,15 @@ function load_property(name, source, trellis, loader) {
         return property;
     }
 }
+function load_property(name, property_source, trellis, loader) {
+    var property = trellis.properties[name] = load_property_inner(name, property_source, trellis, loader);
+    if (property_source.nullable === true)
+        property.is_nullable = true;
+    if (property_source.unique === true)
+        property.is_unique = true;
+    property.default = property_source.default;
+    return property;
+}
 function update_incomplete(trellis, loader) {
     var incomplete = loader.incomplete[trellis.name];
     if (incomplete) {
@@ -94,9 +105,9 @@ function update_incomplete(trellis, loader) {
             var entry = incomplete[i];
             var property = entry.property;
             var type = property.type = load_type(entry.source, loader);
-            if (type.get_category() == trellis_1.Type_Category.incomplete)
+            if (type.get_category() == type_1.Type_Category.incomplete)
                 throw Error("Error resolving incomplete type.");
-            if (type.get_category() == trellis_1.Type_Category.trellis) {
+            if (type.get_category() == type_1.Type_Category.trellis) {
                 property.other_property = find_other_reference_or_null(property.trellis, trellis);
             }
             else {
@@ -106,20 +117,22 @@ function update_incomplete(trellis, loader) {
         delete loader.incomplete[trellis.name];
     }
 }
+function initialize_primary_key(trellis, source, loader) {
+    var primary_key = source.primary_key || 'id';
+    if (primary_key == 'id' && !trellis.properties['id'])
+        trellis.properties['id'] = new trellis_1.Property('id', loader.library.types.uuid, trellis);
+    if (!trellis.properties[primary_key])
+        throw new Error("Could not find primary key " + trellis.name + '.' + primary_key + '.');
+    trellis.primary_key = trellis.properties[primary_key];
+}
 function load_trellis(name, source, loader) {
     var trellis = new trellis_1.Trellis(name);
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
     for (var name_2 in source.properties) {
         var property_source = source.properties[name_2];
-        var property = trellis.properties[name_2] = load_property(name_2, property_source, trellis, loader);
-        if (property_source.nullable === true)
-            property.nullable = true;
-        property.default = property_source.default;
+        trellis.properties[name_2] = load_property(name_2, property_source, trellis, loader);
     }
-    if (!trellis.properties['id']) {
-        trellis.properties['id'] = new trellis_1.Property('id', loader.library.types.uuid, trellis);
-    }
-    trellis.primary_key = trellis.properties['id'];
+    initialize_primary_key(trellis, source, loader);
     update_incomplete(trellis, loader);
     return trellis;
 }

@@ -1,11 +1,15 @@
-import {Primitive} from "./trellis"
+import {Type, Primitive} from "./type"
+
+export type Type_Map = {[name: string]: Type}
 
 export class Library {
-  types
+  types: Type_Map
 
   constructor() {
     const guid = new Primitive('guid')
+
     this.types = {
+      long: new Primitive('long'),
       bool: new Primitive('bool'),
       date: new Primitive('date'),
       float: new Primitive('float'),
@@ -15,5 +19,12 @@ export class Library {
       int: new Primitive('int'),
       string: new Primitive('string'),
     }
+  }
+
+  add_type(type: Type) {
+    if (this.types[type.name])
+      throw new Error('Library already has a type named ' + type.name + '.')
+
+    this.types [type.name] = type
   }
 }

@@ -1,36 +1,4 @@
-export enum Type_Category {
-  incomplete,
-  primitive,
-  list,
-  trellis
-}
-
-export abstract class Type {
-  name: string
-
-  constructor(name: string) {
-    this.name = name
-  }
-
-  abstract get_category(): Type_Category
-
-  abstract get_other_trellis_name(): string
-}
-
-export class Primitive extends Type {
-
-  constructor(name: string) {
-    super(name)
-  }
-
-  get_category(): Type_Category {
-    return Type_Category.primitive
-  }
-
-  get_other_trellis_name(): string {
-    throw Error("Primitive types do not point to a trellis.")
-  }
-}
+import {Type, Type_Category, List_Type} from './type'
 
 export class Trellis_Type extends Type {
   trellis: Trellis
@@ -49,29 +17,13 @@ export class Trellis_Type extends Type {
   }
 }
 
-export class List_Type extends Type {
-  child_type: Type
-
-  constructor(name: string, child_type: Type) {
-    super(name)
-    this.child_type = child_type
-  }
-
-  get_category(): Type_Category {
-    return Type_Category.list
-  }
-
-  get_other_trellis_name(): string {
-    return this.child_type.get_other_trellis_name()
-  }
-}
-
 export class Property {
   name: string
   type: Type
   trellis: Trellis
-  nullable: boolean = false
+  is_nullable: boolean = false
   "default": any
+  is_unique: boolean = false
 
   constructor(name: string, type: Type, trellis: Trellis) {
     this.name = name
@@ -87,6 +39,10 @@ export class Property {
     return this.type.get_category() == Type_Category.trellis
       || this.type.get_category() == Type_Category.list
       || this.type.get_category() == Type_Category.incomplete
+  }
+
+  is_list(): boolean {
+    return this.type.get_category() == Type_Category.list
   }
 }
 
@@ -110,7 +66,39 @@ export class Trellis {
   properties: {[name: string]: Property} = {}
   primary_key: Property
 
+  private lists: Reference[]
+
   constructor(name: string) {
     this.name = name
+  }
+
+  get_lists(): Reference[] {
+    if (this.lists)
+      return this.lists
+
+    const result = []
+    for (let name in this.properties) {
+      const property = this.properties [name]
+      if (property.is_list())
+        result.push(property)
+    }
+
+    this.lists = result
+    return result
+  }
+
+  get_identity(data) {
+    if (!data)
+      throw new Error("Identity cannot be empty.")
+
+    const id = data[this.primary_key.name]
+    if (id)
+      return id
+
+    if (typeof data === 'object')
+      throw new Error('Cannot retrieve identity from object because primary key "'
+        + this.primary_key.name + '" is missing.')
+
+    return data
   }
 }

@@ -13,6 +13,9 @@ var Schema = (function () {
     Schema.prototype.define = function (definitions) {
         loading_1.load_schema(definitions, this.trellises, this.library);
     };
+    Schema.prototype.add_type = function (type) {
+        this.library.add_type(type);
+    };
     return Schema;
 }());
 exports.Schema = Schema;
