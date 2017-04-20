@@ -1,5 +1,6 @@
 "use strict";
-var library_1 = require('./library');
+Object.defineProperty(exports, "__esModule", { value: true });
+var library_1 = require("./library");
 var loading_1 = require("./loading");
 var Schema = (function () {
     function Schema(definitions) {

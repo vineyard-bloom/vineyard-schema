@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var type_1 = require("./type");
 var Library = (function () {
     function Library() {
@@ -7,12 +8,14 @@ var Library = (function () {
             long: new type_1.Primitive('long'),
             bool: new type_1.Primitive('bool'),
             date: new type_1.Primitive('date'),
+            datetime: new type_1.Primitive('datetime'),
             float: new type_1.Primitive('float'),
             guid: guid,
             uuid: guid,
             json: new type_1.Primitive('json'),
             int: new type_1.Primitive('int'),
             string: new type_1.Primitive('string'),
+            time: new type_1.Primitive('time'),
         };
     }
     Library.prototype.add_type = function (type) {

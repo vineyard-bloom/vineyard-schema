@@ -1,17 +1,24 @@
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var type_1 = require('./type');
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var type_1 = require("./type");
 var trellis_1 = require("./trellis");
 var Incomplete_Type = (function (_super) {
     __extends(Incomplete_Type, _super);
     function Incomplete_Type(target_name, source) {
-        _super.call(this, "Incomplete: " + target_name);
-        this.target_name = target_name;
-        this.source = source;
+        var _this = _super.call(this, "Incomplete: " + target_name) || this;
+        _this.target_name = target_name;
+        _this.source = source;
+        return _this;
     }
     Incomplete_Type.prototype.get_category = function () {
         return type_1.Type_Category.incomplete;

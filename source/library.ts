@@ -12,12 +12,14 @@ export class Library {
       long: new Primitive('long'),
       bool: new Primitive('bool'),
       date: new Primitive('date'),
+      datetime: new Primitive('datetime'),
       float: new Primitive('float'),
       guid: guid,
       uuid: guid,
       json: new Primitive('json'),
       int: new Primitive('int'),
       string: new Primitive('string'),
+      time: new Primitive('time'),
     }
   }
 
