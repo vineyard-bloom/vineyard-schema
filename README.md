@@ -1,10 +1,13 @@
 # Vineyard Schema
 
-## Defining a Schema
-```
-import * as scheming from 'vineyard-schema'
+Vineyard Schema is a library for defining data structures and their relationships.  The definition for a schema is normally stored in a JSON file.
 
-const schema = new scheming.Schema({
+## Defining a Schema
+
+```
+import {Schema} from 'vineyard-schema'
+
+const schema = new Schema({
         
     Character: {
         properties: {
@@ -30,11 +33,4 @@ const schema = new scheming.Schema({
     },
         
         
-```
-
-## Applying a Schema to Sequelize
-
-```
-const db = new sequelize(config.database)
-vineyard_schema.vineyard_to_sequelize(schema, db)
 ```
