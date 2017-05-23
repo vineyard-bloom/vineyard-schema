@@ -27,6 +27,7 @@ export declare class Trellis {
     properties: {
         [name: string]: Property;
     };
+    primary_keys: Property[];
     primary_key: Property;
     private lists;
     constructor(name: string);

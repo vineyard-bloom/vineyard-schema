@@ -8,7 +8,8 @@ export interface Property_Source {
     unique?: boolean;
 }
 export interface Trellis_Source {
-    primary_key?: string;
+    primary_key?: string | string[];
+    primary?: string | string[];
     properties: {
         [name: string]: Property_Source;
     };

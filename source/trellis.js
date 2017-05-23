@@ -64,9 +64,19 @@ var Reference = (function (_super) {
     return Reference;
 }(Property));
 exports.Reference = Reference;
+function get_key_identity(data, name) {
+    var id = data[name];
+    if (id)
+        return id;
+    if (typeof data === 'object')
+        throw new Error('Cannot retrieve identity from object because primary key "'
+            + name + '" is missing.');
+    return data;
+}
 var Trellis = (function () {
     function Trellis(name) {
         this.properties = {};
+        this.primary_keys = [];
         this.name = name;
     }
     Trellis.prototype.get_lists = function () {
@@ -84,13 +94,15 @@ var Trellis = (function () {
     Trellis.prototype.get_identity = function (data) {
         if (!data)
             throw new Error("Identity cannot be empty.");
-        var id = data[this.primary_key.name];
-        if (id)
-            return id;
-        if (typeof data === 'object')
-            throw new Error('Cannot retrieve identity from object because primary key "'
-                + this.primary_key.name + '" is missing.');
-        return data;
+        if (this.primary_keys.length > 1) {
+            var result = {};
+            for (var i = 0; i < this.primary_keys.length; ++i) {
+                var property = this.primary_keys[i];
+                result[property.name] = get_key_identity(data, property.name);
+            }
+            return result;
+        }
+        return get_key_identity(data, this.primary_keys[0].name);
     };
     return Trellis;
 }());

@@ -124,13 +124,28 @@ function update_incomplete(trellis, loader) {
         delete loader.incomplete[trellis.name];
     }
 }
-function initialize_primary_key(trellis, source, loader) {
-    var primary_key = source.primary_key || 'id';
+function initialize_primary_key(primary_key, trellis, loader) {
     if (primary_key == 'id' && !trellis.properties['id'])
         trellis.properties['id'] = new trellis_1.Property('id', loader.library.types.uuid, trellis);
     if (!trellis.properties[primary_key])
         throw new Error("Could not find primary key " + trellis.name + '.' + primary_key + '.');
-    trellis.primary_key = trellis.properties[primary_key];
+    return trellis.properties[primary_key];
+}
+function format_primary_keys(primary_keys, trellis_name) {
+    if (!primary_keys)
+        return ['id'];
+    if (typeof primary_keys == 'string')
+        return [primary_keys];
+    if (Array.isArray(primary_keys))
+        return primary_keys;
+    throw new Error("Invalid primary keys format for trellis " + trellis_name + '.');
+}
+function initialize_primary_keys(trellis, source, loader) {
+    var primary_keys = format_primary_keys(source.primary || source.primary_key, trellis.name);
+    for (var i = 0; i < primary_keys.length; ++i) {
+        trellis.primary_keys.push(initialize_primary_key(primary_keys[i], trellis, loader));
+    }
+    trellis.primary_key = trellis.primary_keys[0];
 }
 function load_trellis(name, source, loader) {
     var trellis = new trellis_1.Trellis(name);
@@ -139,7 +154,7 @@ function load_trellis(name, source, loader) {
         var property_source = source.properties[name_2];
         trellis.properties[name_2] = load_property(name_2, property_source, trellis, loader);
     }
-    initialize_primary_key(trellis, source, loader);
+    initialize_primary_keys(trellis, source, loader);
     update_incomplete(trellis, loader);
     return trellis;
 }

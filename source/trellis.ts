@@ -61,9 +61,24 @@ export class Reference extends Property {
   }
 }
 
+function get_key_identity(data, name) {
+  const id = data[name]
+  if (id)
+    return id
+
+  if (typeof data === 'object')
+    throw new Error('Cannot retrieve identity from object because primary key "'
+      + name + '" is missing.')
+
+  return data
+}
+
 export class Trellis {
   name: string
   properties: {[name: string]: Property} = {}
+  primary_keys: Property[] = []
+
+  // Deprecated
   primary_key: Property
 
   private lists: Reference[]
@@ -91,14 +106,15 @@ export class Trellis {
     if (!data)
       throw new Error("Identity cannot be empty.")
 
-    const id = data[this.primary_key.name]
-    if (id)
-      return id
+    if (this.primary_keys.length > 1) {
+      const result = {}
+      for (let i = 0; i < this.primary_keys.length; ++i) {
+        const property = this.primary_keys[i]
+        result[property.name] = get_key_identity(data, property.name)
+      }
+      return result
+    }
 
-    if (typeof data === 'object')
-      throw new Error('Cannot retrieve identity from object because primary key "'
-        + this.primary_key.name + '" is missing.')
-
-    return data
+    return get_key_identity(data, this.primary_keys[0].name)
   }
 }

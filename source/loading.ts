@@ -35,18 +35,19 @@ export interface Property_Source {
 }
 
 export interface Trellis_Source {
-  primary_key?: string
-  properties: {[name: string]: Property_Source}
+  primary_key?: string | string[]
+  primary?: string | string[]
+  properties: { [name: string]: Property_Source }
 }
 
-export type Schema_Source = {[name: string]: Trellis_Source}
+export type Schema_Source = { [name: string]: Trellis_Source }
 
 interface Incomplete_Reference {
   property: Property
   source: Property_Source
 }
 
-type Incomplete_Map = {[trellis_name: string]: Incomplete_Reference[]}
+type Incomplete_Map = { [trellis_name: string]: Incomplete_Reference[] }
 
 class Loader {
   incomplete: Incomplete_Map = {}
@@ -134,7 +135,7 @@ function load_property(name: string, property_source: Property_Source, trellis: 
   if (property_source.nullable === true)
     property.is_nullable = true
 
-  if(property_source.unique === true)
+  if (property_source.unique === true)
     property.is_unique = true
 
   property.default = property_source.default
@@ -162,8 +163,7 @@ function update_incomplete(trellis: Trellis, loader: Loader) {
   }
 }
 
-function initialize_primary_key(trellis: Trellis, source: Trellis_Source, loader: Loader) {
-  const primary_key = source.primary_key || 'id'
+function initialize_primary_key(primary_key: string, trellis: Trellis, loader: Loader) {
 
   if (primary_key == 'id' && !trellis.properties['id'])
     trellis.properties['id'] = new Property('id', loader.library.types.uuid, trellis)
@@ -171,7 +171,29 @@ function initialize_primary_key(trellis: Trellis, source: Trellis_Source, loader
   if (!trellis.properties[primary_key])
     throw new Error("Could not find primary key " + trellis.name + '.' + primary_key + '.')
 
-  trellis.primary_key = trellis.properties[primary_key]
+  return trellis.properties[primary_key]
+}
+
+function format_primary_keys(primary_keys, trellis_name: string) {
+  if (!primary_keys)
+    return ['id']
+
+  if (typeof primary_keys == 'string')
+    return [primary_keys]
+
+  if (Array.isArray(primary_keys))
+    return primary_keys
+
+  throw new Error("Invalid primary keys format for trellis " + trellis_name + '.')
+}
+
+function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loader: Loader) {
+  const primary_keys = format_primary_keys(source.primary || source.primary_key, trellis.name)
+  for (let i = 0; i < primary_keys.length; ++i) {
+    trellis.primary_keys.push(initialize_primary_key(primary_keys[i], trellis, loader))
+  }
+
+  trellis.primary_key = trellis.primary_keys[0]
 }
 
 function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
@@ -183,13 +205,13 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
     trellis.properties [name] = load_property(name, property_source, trellis, loader)
   }
 
-  initialize_primary_key(trellis, source, loader)
+  initialize_primary_keys(trellis, source, loader)
   update_incomplete(trellis, loader)
 
   return trellis
 }
 
-export function load_schema(definitions: Schema_Source, trellises: {[name: string]: Trellis}, library: Library) {
+export function load_schema(definitions: Schema_Source, trellises: { [name: string]: Trellis }, library: Library) {
   const loader = new Loader(library)
 
   for (let name in definitions) {
