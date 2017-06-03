@@ -11,11 +11,12 @@ var Library = (function () {
             datetime: new type_1.Primitive('datetime'),
             float: new type_1.Primitive('float'),
             guid: guid,
-            uuid: guid,
-            json: new type_1.Primitive('json'),
             int: new type_1.Primitive('int'),
+            json: new type_1.Primitive('json'),
             string: new type_1.Primitive('string'),
             time: new type_1.Primitive('time'),
+            text: new type_1.Primitive('text'),
+            uuid: guid,
         };
     }
     Library.prototype.add_type = function (type) {

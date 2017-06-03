@@ -15,11 +15,12 @@ export class Library {
       datetime: new Primitive('datetime'),
       float: new Primitive('float'),
       guid: guid,
-      uuid: guid,
-      json: new Primitive('json'),
       int: new Primitive('int'),
+      json: new Primitive('json'),
       string: new Primitive('string'),
       time: new Primitive('time'),
+      text: new Primitive('text'),
+      uuid: guid,
     }
   }
 
