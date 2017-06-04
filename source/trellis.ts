@@ -82,6 +82,7 @@ export class Trellis {
   primary_key: Property
 
   private lists: Reference[]
+  additional:any = {}
 
   constructor(name: string) {
     this.name = name

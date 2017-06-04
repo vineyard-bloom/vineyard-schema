@@ -154,6 +154,8 @@ function load_trellis(name, source, loader) {
         var property_source = source.properties[name_2];
         trellis.properties[name_2] = load_property(name_2, property_source, trellis, loader);
     }
+    if (source.additional)
+        trellis.additional = source.additional;
     initialize_primary_keys(trellis, source, loader);
     update_incomplete(trellis, loader);
     return trellis;

@@ -38,6 +38,7 @@ export interface Trellis_Source {
   primary_key?: string | string[]
   primary?: string | string[]
   properties: { [name: string]: Property_Source }
+  additional?:any
 }
 
 export type Schema_Source = { [name: string]: Trellis_Source }
@@ -204,6 +205,9 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
     const property_source = source.properties [name]
     trellis.properties [name] = load_property(name, property_source, trellis, loader)
   }
+  
+  if (source.additional)
+    trellis.additional = source.additional
 
   initialize_primary_keys(trellis, source, loader)
   update_incomplete(trellis, loader)

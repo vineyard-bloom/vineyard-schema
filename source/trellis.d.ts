@@ -30,6 +30,7 @@ export declare class Trellis {
     primary_keys: Property[];
     primary_key: Property;
     private lists;
+    additional: any;
     constructor(name: string);
     get_lists(): Reference[];
     get_identity(data: any): any;

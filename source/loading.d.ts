@@ -13,6 +13,7 @@ export interface Trellis_Source {
     properties: {
         [name: string]: Property_Source;
     };
+    additional?: any;
 }
 export declare type Schema_Source = {
     [name: string]: Trellis_Source;
