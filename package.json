@@ -1,6 +1,6 @@
 {
   "name": "vineyard-schema",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Vineyard Schema",
   "main": "source/index.js",
   "types": "source/index.d.ts",
