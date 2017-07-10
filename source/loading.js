@@ -64,7 +64,8 @@ function find_other_references(trellis, other_trellis) {
 function find_other_reference_or_null(trellis, other_trellis) {
     var references = find_other_references(trellis, other_trellis);
     if (references.length > 1)
-        throw Error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".");
+        console.error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".");
+    // throw Error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".")
     return references[0];
 }
 function find_other_reference(trellis, other_trellis) {

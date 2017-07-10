@@ -94,7 +94,8 @@ function find_other_references(trellis: Trellis, other_trellis: Trellis): Refere
 function find_other_reference_or_null(trellis: Trellis, other_trellis: Trellis): Reference {
   const references = find_other_references(trellis, other_trellis)
   if (references.length > 1)
-    throw Error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".")
+    console.error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".")
+  // throw Error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".")
 
   return references [0]
 }
