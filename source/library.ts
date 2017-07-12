@@ -11,6 +11,7 @@ export class Library {
     this.types = {
       long: new Primitive('long'),
       bool: new Primitive('bool'),
+      colossal: new Primitive('colossal'),
       date: new Primitive('date'),
       datetime: new Primitive('datetime'),
       float: new Primitive('float'),

@@ -7,6 +7,7 @@ var Library = (function () {
         this.types = {
             long: new type_1.Primitive('long'),
             bool: new type_1.Primitive('bool'),
+            colossal: new type_1.Primitive('colossal'),
             date: new type_1.Primitive('date'),
             datetime: new type_1.Primitive('datetime'),
             float: new type_1.Primitive('float'),
