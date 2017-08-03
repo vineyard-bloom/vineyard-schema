@@ -34,4 +34,5 @@ export declare class Trellis {
     constructor(name: string);
     get_lists(): Reference[];
     get_identity(data: any): any;
+    getIdentity(data: any): any;
 }

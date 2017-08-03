@@ -105,6 +105,9 @@ var Trellis = (function () {
         }
         return get_key_identity(data, this.primary_keys[0].name);
     };
+    Trellis.prototype.getIdentity = function (data) {
+        return this.get_identity(data);
+    };
     return Trellis;
 }());
 exports.Trellis = Trellis;

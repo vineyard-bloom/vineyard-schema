@@ -118,4 +118,8 @@ export class Trellis {
 
     return get_key_identity(data, this.primary_keys[0].name)
   }
+
+  getIdentity(data) {
+    return this.get_identity(data)
+  }
 }
