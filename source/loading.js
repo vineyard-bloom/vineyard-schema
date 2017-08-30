@@ -75,6 +75,8 @@ function find_other_reference(trellis, other_trellis) {
     return reference;
 }
 function load_property_inner(name, source, trellis, loader) {
+    if (!source.type)
+        throw new Error(trellis.name + "." + name + " is missing a type property.");
     var type = load_type(source, loader);
     if (type.get_category() == type_1.Type_Category.primitive) {
         return new trellis_1.Property(name, type, trellis);

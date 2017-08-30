@@ -109,6 +109,9 @@ function find_other_reference(trellis: Trellis, other_trellis: Trellis): Referen
 }
 
 function load_property_inner(name: string, source: Property_Source, trellis: Trellis, loader: Loader): Property {
+  if (!source.type)
+    throw new Error(trellis.name + "." + name + " is missing a type property.")
+
   const type = load_type(source, loader)
   if (type.get_category() == Type_Category.primitive) {
     return new Property(name, type, trellis)
