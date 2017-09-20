@@ -5,6 +5,7 @@ export interface Property_Source {
     trellis?: string;
     nullable?: boolean;
     "default"?: any;
+    defaultValue?: any;
     unique?: boolean;
 }
 export interface Trellis_Source {
@@ -14,6 +15,7 @@ export interface Trellis_Source {
         [name: string]: Property_Source;
     };
     additional?: any;
+    parent?: string;
 }
 export declare type Schema_Source = {
     [name: string]: Trellis_Source;

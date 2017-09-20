@@ -105,7 +105,9 @@ function load_property(name, property_source, trellis, loader) {
         property.is_nullable = true;
     if (property_source.unique === true)
         property.is_unique = true;
-    property.default = property_source.default;
+    property.default = property_source.defaultValue !== undefined
+        ? property_source.defaultValue
+        : property_source.default;
     return property;
 }
 function update_incomplete(trellis, loader) {
@@ -168,6 +170,14 @@ function load_schema(definitions, trellises, library) {
     for (var name_3 in definitions) {
         var definition = definitions[name_3];
         trellises[name_3] = load_trellis(name_3, definition, loader);
+    }
+    for (var name_4 in definitions) {
+        var definition = definitions[name_4];
+        if (typeof definition.parent == 'string') {
+            if (!trellises[definition.parent])
+                throw Error("Invalid parent trellis: " + definition.parent + '.');
+            trellises[name_4].parent = trellises[definition.parent];
+        }
     }
     for (var a in loader.incomplete) {
         throw Error("Unknown type '" + a + "'.");

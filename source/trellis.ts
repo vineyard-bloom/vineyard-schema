@@ -77,6 +77,7 @@ export class Trellis {
   name: string
   properties: {[name: string]: Property} = {}
   primary_keys: Property[] = []
+  parent: Trellis = null
 
   // Deprecated
   primary_key: Property

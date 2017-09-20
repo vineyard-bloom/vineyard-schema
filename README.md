@@ -30,7 +30,14 @@ const schema = new Schema({
                 type: "Character",
             },
         }
-    },
-        
-        
+    },                
+```
+
+```
+export interface Trellis_Source {
+  primary_key?: string | string[]
+  primary?: string | string[] // Deprecated
+  properties: { [name: string]: Property_Source }
+  additional?:any
+}
 ```

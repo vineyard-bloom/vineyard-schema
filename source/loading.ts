@@ -31,14 +31,16 @@ export interface Property_Source {
   trellis?: string
   nullable?: boolean
   "default"?: any
+  defaultValue?: any
   unique?: boolean
 }
 
 export interface Trellis_Source {
   primary_key?: string | string[]
-  primary?: string | string[]
+  primary?: string | string[] // Deprecated
   properties: { [name: string]: Property_Source }
   additional?:any
+  parent?: string
 }
 
 export type Schema_Source = { [name: string]: Trellis_Source }
@@ -143,7 +145,10 @@ function load_property(name: string, property_source: Property_Source, trellis: 
   if (property_source.unique === true)
     property.is_unique = true
 
-  property.default = property_source.default
+  property.default = property_source.defaultValue !== undefined
+    ? property_source.defaultValue
+    : property_source.default
+
   return property
 }
 
@@ -225,6 +230,16 @@ export function load_schema(definitions: Schema_Source, trellises: { [name: stri
   for (let name in definitions) {
     const definition = definitions [name]
     trellises [name] = load_trellis(name, definition, loader)
+  }
+
+  for (let name in definitions) {
+    const definition = definitions [name]
+    if (typeof definition.parent == 'string') {
+      if (!trellises[definition.parent])
+        throw Error("Invalid parent trellis: " + definition.parent + '.')
+
+      trellises [name].parent = trellises [definition.parent ]
+    }
   }
 
   for (let a in loader.incomplete) {

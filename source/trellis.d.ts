@@ -28,6 +28,7 @@ export declare class Trellis {
         [name: string]: Property;
     };
     primary_keys: Property[];
+    parent: Trellis;
     primary_key: Property;
     private lists;
     additional: any;

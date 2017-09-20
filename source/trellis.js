@@ -77,6 +77,7 @@ var Trellis = (function () {
     function Trellis(name) {
         this.properties = {};
         this.primary_keys = [];
+        this.parent = null;
         this.additional = {};
         this.name = name;
     }
