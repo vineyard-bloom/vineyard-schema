@@ -17,7 +17,22 @@ export class Trellis_Type extends Type {
   }
 }
 
-export class Property {
+export interface Property {
+  name: string
+  type: Type
+  trellis: Trellis
+  is_nullable: boolean
+  "default": any
+  is_unique: boolean
+
+  get_path(): string
+
+  is_reference(): boolean
+
+  is_list(): boolean
+}
+
+export class StandardProperty implements Property {
   name: string
   type: Type
   trellis: Trellis
@@ -46,7 +61,7 @@ export class Property {
   }
 }
 
-export class Reference extends Property {
+export class Reference extends StandardProperty {
   other_property: Property
 
   constructor(name: string, type: Type, trellis: Trellis, other_property: Property) {
@@ -73,9 +88,16 @@ function get_key_identity(data, name) {
   return data
 }
 
-export class Trellis {
+export interface ITrellis {
   name: string
-  properties: {[name: string]: Property} = {}
+  properties: { [name: string]: Property }
+  primary_keys: Property[]
+  parent: Trellis
+}
+
+export class Trellis implements ITrellis {
+  name: string
+  properties: { [name: string]: Property } = {}
   primary_keys: Property[] = []
   parent: Trellis = null
 
@@ -83,7 +105,7 @@ export class Trellis {
   primary_key: Property
 
   private lists: Reference[]
-  additional:any = {}
+  additional: any = {}
 
   constructor(name: string) {
     this.name = name
@@ -123,4 +145,20 @@ export class Trellis {
   getIdentity(data) {
     return this.get_identity(data)
   }
+}
+
+export function getIdentity(trellis: ITrellis, data: any) {
+  if (!data)
+    throw new Error("Identity cannot be empty.")
+
+  if (trellis.primary_keys.length > 1) {
+    const result = {}
+    for (let i = 0; i < trellis.primary_keys.length; ++i) {
+      const property = trellis.primary_keys[i]
+      result[property.name] = get_key_identity(data, property.name)
+    }
+    return result
+  }
+
+  return get_key_identity(data, trellis.primary_keys[0].name)
 }

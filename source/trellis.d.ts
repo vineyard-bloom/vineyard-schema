@@ -5,7 +5,18 @@ export declare class Trellis_Type extends Type {
     get_category(): Type_Category;
     get_other_trellis_name(): string;
 }
-export declare class Property {
+export interface Property {
+    name: string;
+    type: Type;
+    trellis: Trellis;
+    is_nullable: boolean;
+    "default": any;
+    is_unique: boolean;
+    get_path(): string;
+    is_reference(): boolean;
+    is_list(): boolean;
+}
+export declare class StandardProperty implements Property {
     name: string;
     type: Type;
     trellis: Trellis;
@@ -17,12 +28,20 @@ export declare class Property {
     is_reference(): boolean;
     is_list(): boolean;
 }
-export declare class Reference extends Property {
+export declare class Reference extends StandardProperty {
     other_property: Property;
     constructor(name: string, type: Type, trellis: Trellis, other_property: Property);
     get_other_trellis(): Trellis;
 }
-export declare class Trellis {
+export interface ITrellis {
+    name: string;
+    properties: {
+        [name: string]: Property;
+    };
+    primary_keys: Property[];
+    parent: Trellis;
+}
+export declare class Trellis implements ITrellis {
     name: string;
     properties: {
         [name: string]: Property;
@@ -37,3 +56,4 @@ export declare class Trellis {
     get_identity(data: any): any;
     getIdentity(data: any): any;
 }
+export declare function getIdentity(trellis: ITrellis, data: any): any;

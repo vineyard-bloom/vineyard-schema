@@ -27,28 +27,28 @@ var Trellis_Type = (function (_super) {
     return Trellis_Type;
 }(type_1.Type));
 exports.Trellis_Type = Trellis_Type;
-var Property = (function () {
-    function Property(name, type, trellis) {
+var StandardProperty = (function () {
+    function StandardProperty(name, type, trellis) {
         this.is_nullable = false;
         this.is_unique = false;
         this.name = name;
         this.type = type;
         this.trellis = trellis;
     }
-    Property.prototype.get_path = function () {
+    StandardProperty.prototype.get_path = function () {
         return this.trellis.name + '.' + this.name;
     };
-    Property.prototype.is_reference = function () {
+    StandardProperty.prototype.is_reference = function () {
         return this.type.get_category() == type_1.Type_Category.trellis
             || this.type.get_category() == type_1.Type_Category.list
             || this.type.get_category() == type_1.Type_Category.incomplete;
     };
-    Property.prototype.is_list = function () {
+    StandardProperty.prototype.is_list = function () {
         return this.type.get_category() == type_1.Type_Category.list;
     };
-    return Property;
+    return StandardProperty;
 }());
-exports.Property = Property;
+exports.StandardProperty = StandardProperty;
 var Reference = (function (_super) {
     __extends(Reference, _super);
     function Reference(name, type, trellis, other_property) {
@@ -62,7 +62,7 @@ var Reference = (function (_super) {
             : this.type.child_type.trellis;
     };
     return Reference;
-}(Property));
+}(StandardProperty));
 exports.Reference = Reference;
 function get_key_identity(data, name) {
     var id = data[name];
@@ -112,4 +112,18 @@ var Trellis = (function () {
     return Trellis;
 }());
 exports.Trellis = Trellis;
+function getIdentity(trellis, data) {
+    if (!data)
+        throw new Error("Identity cannot be empty.");
+    if (trellis.primary_keys.length > 1) {
+        var result = {};
+        for (var i = 0; i < trellis.primary_keys.length; ++i) {
+            var property = trellis.primary_keys[i];
+            result[property.name] = get_key_identity(data, property.name);
+        }
+        return result;
+    }
+    return get_key_identity(data, trellis.primary_keys[0].name);
+}
+exports.getIdentity = getIdentity;
 //# sourceMappingURL=trellis.js.map

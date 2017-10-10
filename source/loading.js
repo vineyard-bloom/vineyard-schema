@@ -79,7 +79,7 @@ function load_property_inner(name, source, trellis, loader) {
         throw new Error(trellis.name + "." + name + " is missing a type property.");
     var type = load_type(source, loader);
     if (type.get_category() == type_1.Type_Category.primitive) {
-        return new trellis_1.Property(name, type, trellis);
+        return new trellis_1.StandardProperty(name, type, trellis);
     }
     else if (type.get_category() == type_1.Type_Category.trellis) {
         return new trellis_1.Reference(name, type, trellis, find_other_reference_or_null(trellis, type.trellis));
@@ -131,7 +131,7 @@ function update_incomplete(trellis, loader) {
 }
 function initialize_primary_key(primary_key, trellis, loader) {
     if (primary_key == 'id' && !trellis.properties['id'])
-        trellis.properties['id'] = new trellis_1.Property('id', loader.library.types.uuid, trellis);
+        trellis.properties['id'] = new trellis_1.StandardProperty('id', loader.library.types.uuid, trellis);
     if (!trellis.properties[primary_key])
         throw new Error("Could not find primary key " + trellis.name + '.' + primary_key + '.');
     return trellis.properties[primary_key];

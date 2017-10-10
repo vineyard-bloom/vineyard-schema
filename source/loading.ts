@@ -4,12 +4,12 @@ import {
   Trellis,
   Reference,
   Property,
-  Trellis_Type,
+  Trellis_Type, StandardProperty,
 } from "./trellis"
 
 class Incomplete_Type extends Type {
   target_name: string
-  source
+  source:any
 
   constructor(target_name: string, source) {
     super("Incomplete: " + target_name)
@@ -116,7 +116,7 @@ function load_property_inner(name: string, source: Property_Source, trellis: Tre
 
   const type = load_type(source, loader)
   if (type.get_category() == Type_Category.primitive) {
-    return new Property(name, type, trellis)
+    return new StandardProperty(name, type, trellis)
   }
   else if (type.get_category() == Type_Category.trellis) {
     return new Reference(name, type, trellis, find_other_reference_or_null(trellis, (type as Trellis_Type).trellis))
@@ -176,7 +176,7 @@ function update_incomplete(trellis: Trellis, loader: Loader) {
 function initialize_primary_key(primary_key: string, trellis: Trellis, loader: Loader) {
 
   if (primary_key == 'id' && !trellis.properties['id'])
-    trellis.properties['id'] = new Property('id', loader.library.types.uuid, trellis)
+    trellis.properties['id'] = new StandardProperty('id', loader.library.types.uuid, trellis)
 
   if (!trellis.properties[primary_key])
     throw new Error("Could not find primary key " + trellis.name + '.' + primary_key + '.')
