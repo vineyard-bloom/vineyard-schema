@@ -15,7 +15,7 @@ export class Schema {
     }
   }
 
-  define(definitions) {
+  define(definitions:any) {
     load_schema(definitions, this.trellises, this.library)
   }
 

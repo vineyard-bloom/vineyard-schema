@@ -41,10 +41,12 @@ function load_type(source, loader) {
     if (result)
         return result;
     if (source.type == 'list') {
-        var result_1 = types[source.trellis];
-        if (result_1)
-            return new type_1.List_Type(result_1.name, result_1);
-        return new Incomplete_Type(source.trellis, source);
+        if (source.trellis) {
+            var result_1 = types[source.trellis];
+            if (result_1)
+                return new type_1.List_Type(result_1.name, result_1);
+        }
+        return new Incomplete_Type(source.trellis || "", source);
     }
     return new Incomplete_Type(source.type, source);
     // throw Error("Not supported: " + JSON.stringify(source))
@@ -89,7 +91,7 @@ function load_property_inner(name, source, trellis, loader) {
         return new trellis_1.Reference(name, type, trellis, find_other_reference(trellis, list_type.child_type.trellis));
     }
     else if (type.get_category() == type_1.Type_Category.incomplete) {
-        var property = new trellis_1.Reference(name, type, trellis, null);
+        var property = new trellis_1.Reference(name, type, trellis);
         var target = type.target_name;
         var incomplete = loader.incomplete[target] = loader.incomplete[target] || [];
         incomplete.push({
@@ -97,6 +99,9 @@ function load_property_inner(name, source, trellis, loader) {
             source: source
         });
         return property;
+    }
+    else {
+        throw new Error("Unsupported property type");
     }
 }
 function load_property(name, property_source, trellis, loader) {

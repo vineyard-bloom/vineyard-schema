@@ -64,9 +64,10 @@ export class StandardProperty implements Property {
 export class Reference extends StandardProperty {
   other_property: Property
 
-  constructor(name: string, type: Type, trellis: Trellis, other_property: Property) {
+  constructor(name: string, type: Type, trellis: Trellis, other_property?: Property) {
     super(name, type, trellis)
-    this.other_property = other_property
+    if (other_property)
+      this.other_property = other_property
   }
 
   get_other_trellis(): Trellis {
@@ -76,7 +77,7 @@ export class Reference extends StandardProperty {
   }
 }
 
-function get_key_identity(data, name) {
+function get_key_identity(data: any, name: string) {
   const id = data[name]
   if (id)
     return id
@@ -92,14 +93,14 @@ export interface ITrellis {
   name: string
   properties: { [name: string]: Property }
   primary_keys: Property[]
-  parent: Trellis
+  parent?: Trellis | null
 }
 
 export class Trellis implements ITrellis {
   name: string
   properties: { [name: string]: Property } = {}
   primary_keys: Property[] = []
-  parent: Trellis = null
+  parent: Trellis | null = null
 
   // Deprecated
   primary_key: Property
@@ -115,23 +116,23 @@ export class Trellis implements ITrellis {
     if (this.lists)
       return this.lists
 
-    const result = []
+    const result: Reference[] = []
     for (let name in this.properties) {
       const property = this.properties [name]
       if (property.is_list())
-        result.push(property)
+        result.push(property as Reference)
     }
 
     this.lists = result
     return result
   }
 
-  get_identity(data) {
+  get_identity(data: any) {
     if (!data)
       throw new Error("Identity cannot be empty.")
 
     if (this.primary_keys.length > 1) {
-      const result = {}
+      const result: { [name: string]: any } = {}
       for (let i = 0; i < this.primary_keys.length; ++i) {
         const property = this.primary_keys[i]
         result[property.name] = get_key_identity(data, property.name)
@@ -142,7 +143,7 @@ export class Trellis implements ITrellis {
     return get_key_identity(data, this.primary_keys[0].name)
   }
 
-  getIdentity(data) {
+  getIdentity(data: any) {
     return this.get_identity(data)
   }
 }
@@ -152,7 +153,7 @@ export function getIdentity(trellis: ITrellis, data: any) {
     throw new Error("Identity cannot be empty.")
 
   if (trellis.primary_keys.length > 1) {
-    const result = {}
+    const result: { [name: string]: any } = {}
     for (let i = 0; i < trellis.primary_keys.length; ++i) {
       const property = trellis.primary_keys[i]
       result[property.name] = get_key_identity(data, property.name)

@@ -4,14 +4,14 @@ import {
   Trellis,
   Reference,
   Property,
-  Trellis_Type, StandardProperty,
+  Trellis_Type, StandardProperty
 } from "./trellis"
 
 class Incomplete_Type extends Type {
   target_name: string
   source:any
 
-  constructor(target_name: string, source) {
+  constructor(target_name: string, source:any) {
     super("Incomplete: " + target_name)
     this.target_name = target_name
     this.source = source
@@ -46,7 +46,7 @@ export interface Trellis_Source {
 export type Schema_Source = { [name: string]: Trellis_Source }
 
 interface Incomplete_Reference {
-  property: Property
+  property: Reference
   source: Property_Source
 }
 
@@ -69,11 +69,13 @@ function load_type(source: Property_Source, loader: Loader): Type {
     return result
 
   if (source.type == 'list') {
-    const result = types[source.trellis]
-    if (result)
-      return new List_Type(result.name, result)
+    if (source.trellis) {
+      const result = types[source.trellis]
+      if (result)
+        return new List_Type(result.name, result)
+    }
 
-    return new Incomplete_Type(source.trellis, source)
+    return new Incomplete_Type(source.trellis || "", source)
   }
 
   return new Incomplete_Type(source.type, source)
@@ -126,7 +128,7 @@ function load_property_inner(name: string, source: Property_Source, trellis: Tre
     return new Reference(name, type, trellis, find_other_reference(trellis, (list_type.child_type as Trellis_Type).trellis))
   }
   else if (type.get_category() == Type_Category.incomplete) {
-    const property = new Reference(name, type, trellis, null)
+    const property = new Reference(name, type, trellis)
     const target = (type as Incomplete_Type).target_name
     const incomplete = loader.incomplete [target] = loader.incomplete [target] || []
     incomplete.push({
@@ -134,6 +136,9 @@ function load_property_inner(name: string, source: Property_Source, trellis: Tre
       source: source
     })
     return property
+  }
+  else {
+    throw new Error("Unsupported property type")
   }
 }
 
@@ -184,7 +189,7 @@ function initialize_primary_key(primary_key: string, trellis: Trellis, loader: L
   return trellis.properties[primary_key]
 }
 
-function format_primary_keys(primary_keys, trellis_name: string) {
+function format_primary_keys(primary_keys: any, trellis_name: string) {
   if (!primary_keys)
     return ['id']
 

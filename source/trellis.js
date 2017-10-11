@@ -53,7 +53,8 @@ var Reference = (function (_super) {
     __extends(Reference, _super);
     function Reference(name, type, trellis, other_property) {
         var _this = _super.call(this, name, type, trellis) || this;
-        _this.other_property = other_property;
+        if (other_property)
+            _this.other_property = other_property;
         return _this;
     }
     Reference.prototype.get_other_trellis = function () {

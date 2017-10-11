@@ -7,7 +7,7 @@ export declare type Trellis_Map = {
 export declare class Schema {
     trellises: Trellis_Map;
     library: Library;
-    constructor(definitions?: any);
+    constructor(definitions?: undefined);
     define(definitions: any): void;
     add_type(type: Type): void;
 }

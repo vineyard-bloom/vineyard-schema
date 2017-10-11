@@ -30,7 +30,7 @@ export declare class StandardProperty implements Property {
 }
 export declare class Reference extends StandardProperty {
     other_property: Property;
-    constructor(name: string, type: Type, trellis: Trellis, other_property: Property);
+    constructor(name: string, type: Type, trellis: Trellis, other_property?: Property);
     get_other_trellis(): Trellis;
 }
 export interface ITrellis {
@@ -39,7 +39,7 @@ export interface ITrellis {
         [name: string]: Property;
     };
     primary_keys: Property[];
-    parent: Trellis;
+    parent?: Trellis | null;
 }
 export declare class Trellis implements ITrellis {
     name: string;
@@ -47,7 +47,7 @@ export declare class Trellis implements ITrellis {
         [name: string]: Property;
     };
     primary_keys: Property[];
-    parent: Trellis;
+    parent: Trellis | null;
     primary_key: Property;
     private lists;
     additional: any;
