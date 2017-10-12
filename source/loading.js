@@ -53,8 +53,8 @@ function load_type(source, loader) {
 }
 function find_other_references(trellis, other_trellis) {
     var result = [];
-    for (var name_1 in other_trellis.properties) {
-        var property = other_trellis.properties[name_1];
+    for (var name in other_trellis.properties) {
+        var property = other_trellis.properties[name];
         if (property.is_reference()) {
             var reference = property;
             if (reference.type.get_other_trellis_name() == trellis.name)
@@ -160,9 +160,9 @@ function initialize_primary_keys(trellis, source, loader) {
 function load_trellis(name, source, loader) {
     var trellis = new trellis_1.Trellis(name);
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
-    for (var name_2 in source.properties) {
-        var property_source = source.properties[name_2];
-        trellis.properties[name_2] = load_property(name_2, property_source, trellis, loader);
+    for (var name_1 in source.properties) {
+        var property_source = source.properties[name_1];
+        trellis.properties[name_1] = load_property(name_1, property_source, trellis, loader);
     }
     if (source.additional)
         trellis.additional = source.additional;
@@ -172,16 +172,16 @@ function load_trellis(name, source, loader) {
 }
 function load_schema(definitions, trellises, library) {
     var loader = new Loader(library);
-    for (var name_3 in definitions) {
-        var definition = definitions[name_3];
-        trellises[name_3] = load_trellis(name_3, definition, loader);
+    for (var name in definitions) {
+        var definition = definitions[name];
+        trellises[name] = load_trellis(name, definition, loader);
     }
-    for (var name_4 in definitions) {
-        var definition = definitions[name_4];
+    for (var name in definitions) {
+        var definition = definitions[name];
         if (typeof definition.parent == 'string') {
             if (!trellises[definition.parent])
                 throw Error("Invalid parent trellis: " + definition.parent + '.');
-            trellises[name_4].parent = trellises[definition.parent];
+            trellises[name].parent = trellises[definition.parent];
         }
     }
     for (var a in loader.incomplete) {

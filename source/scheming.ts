@@ -9,7 +9,7 @@ export class Schema {
   trellises: Trellis_Map = {}
   library: Library = new Library()
 
-  constructor(definitions = undefined) {
+  constructor(definitions: any = undefined) {
     if (definitions) {
       this.define(definitions)
     }

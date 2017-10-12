@@ -86,8 +86,8 @@ var Trellis = (function () {
         if (this.lists)
             return this.lists;
         var result = [];
-        for (var name_1 in this.properties) {
-            var property = this.properties[name_1];
+        for (var name in this.properties) {
+            var property = this.properties[name];
             if (property.is_list())
                 result.push(property);
         }
