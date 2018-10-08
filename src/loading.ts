@@ -63,7 +63,7 @@ function load_type(source: PropertySource, loader: Loader): Types {
   if (result)
     return result
 
-  if (source.type == 'list') {
+  if (source.type == 'List') {
     if (source.trellis) {
       const result = types[source.trellis]
       if (result)
@@ -184,7 +184,7 @@ function update_incomplete(trellis: Trellis, loader: Loader) {
 function initialize_primary_key(primary_key: string, trellis: Trellis, loader: Loader) {
 
   if (primary_key == 'id' && !trellis.properties['id'])
-    trellis.properties['id'] = new StandardProperty('id', loader.library.types.uuid, trellis)
+    trellis.properties['id'] = new StandardProperty('id', loader.library.types.Uuid, trellis)
 
   if (!trellis.properties[primary_key])
     throw new Error("Could not find primary key " + trellis.name + '.' + primary_key + '.')

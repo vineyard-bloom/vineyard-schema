@@ -12,6 +12,7 @@ class LibraryImplementation {
             Float: new types_1.Primitive('Float'),
             Int: new types_1.Primitive('Int'),
             Json: new types_1.Primitive('Json'),
+            Jsonb: new types_1.Primitive('Jsonb'),
             Short: new types_1.Primitive('Short'),
             String: new types_1.Primitive('String'),
             Time: new types_1.Primitive('Time'),

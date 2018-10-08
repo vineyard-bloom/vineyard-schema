@@ -15,6 +15,7 @@ export class LibraryImplementation {
       Float: new Primitive('Float'),
       Int: new Primitive('Int'),
       Json: new Primitive('Json'),
+      Jsonb: new Primitive('Jsonb'),
       Short: new Primitive('Short'),
       String: new Primitive('String'),
       Time: new Primitive('Time'),
