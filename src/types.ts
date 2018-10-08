@@ -78,6 +78,7 @@ export interface PropertySource {
   unique?: boolean
   autoIncrement?: boolean
   length?: number
+  enumValues?: any[]
 }
 
 export interface IndexSource {

@@ -6,25 +6,20 @@ export class LibraryImplementation {
   types: Type_Map
 
   constructor() {
-    const guid = new Primitive('guid')
-
     this.types = {
-      long: new Primitive('long'),
-      bignumber: new Primitive('bignumber'),
-      bool: new Primitive('bool'),
-      char: new Primitive('char'),
-      colossal: new Primitive('colossal'),
-      date: new Primitive('date'),
-      datetime: new Primitive('datetime'),
-      float: new Primitive('float'),
-      guid: guid,
-      int: new Primitive('int'),
-      json: new Primitive('json'),
-      short: new Primitive('short'),
-      string: new Primitive('string'),
-      time: new Primitive('time'),
-      text: new Primitive('text'),
-      uuid: guid,
+      Long: new Primitive('Long'),
+      BigNumber: new Primitive('BigNumber'),
+      Bool: new Primitive('Bool'),
+      Date: new Primitive('Date'),
+      Datetime: new Primitive('Datetime'),
+      Float: new Primitive('Float'),
+      Int: new Primitive('Int'),
+      Json: new Primitive('Json'),
+      Short: new Primitive('Short'),
+      String: new Primitive('String'),
+      Time: new Primitive('Time'),
+      Text: new Primitive('Text'),
+      Uuid: new Primitive('Uuid'),
     }
   }
 

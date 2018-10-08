@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "bignumber.js": "^7.2.1",
+    "pluralize": "^7.0.0",
     "uuid": "^3.0.1"
   },
   "devDependencies": {

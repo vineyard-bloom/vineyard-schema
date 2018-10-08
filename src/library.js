@@ -3,24 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("./types");
 class LibraryImplementation {
     constructor() {
-        const guid = new types_1.Primitive('guid');
         this.types = {
-            long: new types_1.Primitive('long'),
-            bignumber: new types_1.Primitive('bignumber'),
-            bool: new types_1.Primitive('bool'),
-            char: new types_1.Primitive('char'),
-            colossal: new types_1.Primitive('colossal'),
-            date: new types_1.Primitive('date'),
-            datetime: new types_1.Primitive('datetime'),
-            float: new types_1.Primitive('float'),
-            guid: guid,
-            int: new types_1.Primitive('int'),
-            json: new types_1.Primitive('json'),
-            short: new types_1.Primitive('short'),
-            string: new types_1.Primitive('string'),
-            time: new types_1.Primitive('time'),
-            text: new types_1.Primitive('text'),
-            uuid: guid,
+            Long: new types_1.Primitive('Long'),
+            BigNumber: new types_1.Primitive('BigNumber'),
+            Bool: new types_1.Primitive('Bool'),
+            Date: new types_1.Primitive('Date'),
+            Datetime: new types_1.Primitive('Datetime'),
+            Float: new types_1.Primitive('Float'),
+            Int: new types_1.Primitive('Int'),
+            Json: new types_1.Primitive('Json'),
+            Short: new types_1.Primitive('Short'),
+            String: new types_1.Primitive('String'),
+            Time: new types_1.Primitive('Time'),
+            Text: new types_1.Primitive('Text'),
+            Uuid: new types_1.Primitive('Uuid'),
         };
     }
     add_type(type) {
