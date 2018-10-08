@@ -4,7 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./scheming"));
-__export(require("./type"));
+__export(require("./types"));
 __export(require("./library"));
 __export(require("./trellis"));
 __export(require("./loading"));

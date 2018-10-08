@@ -1,8 +1,8 @@
-import {Type, Primitive} from "./type"
+import {Types, Primitive} from "./types"
 
-export type Type_Map = {[name: string]: Type}
+export type Type_Map = {[name: string]: Types}
 
-export class Library {
+export class LibraryImplementation {
   types: Type_Map
 
   constructor() {
@@ -10,7 +10,9 @@ export class Library {
 
     this.types = {
       long: new Primitive('long'),
+      bignumber: new Primitive('bignumber'),
       bool: new Primitive('bool'),
+      char: new Primitive('char'),
       colossal: new Primitive('colossal'),
       date: new Primitive('date'),
       datetime: new Primitive('datetime'),
@@ -18,6 +20,7 @@ export class Library {
       guid: guid,
       int: new Primitive('int'),
       json: new Primitive('json'),
+      short: new Primitive('short'),
       string: new Primitive('string'),
       time: new Primitive('time'),
       text: new Primitive('text'),
@@ -25,9 +28,9 @@ export class Library {
     }
   }
 
-  add_type(type: Type) {
+  add_type(type: Types) {
     if (this.types[type.name])
-      throw new Error('Library already has a type named ' + type.name + '.')
+      throw new Error('LibraryImplementation already has a type named ' + type.name + '.')
 
     this.types [type.name] = type
   }

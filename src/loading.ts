@@ -1,24 +1,38 @@
-import {Type, Type_Category, List_Type} from './type'
-import {Library} from './library'
 import {
+  List_Type,
+  Types,
+  TypeCategory,
+  TrellisSource,
+  PropertySource,
   Trellis,
-  Reference,
+  Table,
   Property,
-  Trellis_Type, StandardProperty
-} from "./trellis"
+  SchemaSource
+} from './types'
+import { LibraryImplementation } from './library'
+import { Reference, StandardProperty, Trellis_Type, TrellisImplementation } from "./trellis"
+import { to_lower_snake_case } from "./utility"
 
-class Incomplete_Type extends Type {
+const pluralize = require('pluralize')
+
+let snakeCaseTables: boolean = true
+
+export function setSnakeCaseTables(value: boolean) {
+  snakeCaseTables = value
+}
+
+class Incomplete_Type extends Types {
   target_name: string
-  source:any
+  source: any
 
-  constructor(target_name: string, source:any) {
+  constructor(target_name: string, source: any) {
     super("Incomplete: " + target_name)
     this.target_name = target_name
     this.source = source
   }
 
-  get_category(): Type_Category {
-    return Type_Category.incomplete
+  get_category(): TypeCategory {
+    return TypeCategory.incomplete
   }
 
   get_other_trellis_name(): string {
@@ -26,42 +40,23 @@ class Incomplete_Type extends Type {
   }
 }
 
-export interface Property_Source {
-  type: string
-  trellis?: string
-  nullable?: boolean
-  "default"?: any
-  defaultValue?: any
-  unique?: boolean
-}
-
-export interface Trellis_Source {
-  primary_key?: string | string[]
-  primary?: string | string[] // Deprecated
-  properties: { [name: string]: Property_Source }
-  additional?:any
-  parent?: string
-}
-
-export type Schema_Source = { [name: string]: Trellis_Source }
-
-interface Incomplete_Reference {
+interface IncompleteReference {
   property: Reference
-  source: Property_Source
+  source: PropertySource
 }
 
-type Incomplete_Map = { [trellis_name: string]: Incomplete_Reference[] }
+type IncompleteMap = { [trellis_name: string]: IncompleteReference[] }
 
 class Loader {
-  incomplete: Incomplete_Map = {}
-  library: Library
+  incomplete: IncompleteMap = {}
+  library: LibraryImplementation
 
-  constructor(library: Library) {
+  constructor(library: LibraryImplementation) {
     this.library = library
   }
 }
 
-function load_type(source: Property_Source, loader: Loader): Type {
+function load_type(source: PropertySource, loader: Loader): Types {
   const types = loader.library.types
 
   const result = types[source.type]
@@ -82,12 +77,12 @@ function load_type(source: Property_Source, loader: Loader): Type {
   // throw Error("Not supported: " + JSON.stringify(source))
 }
 
-function find_other_references(trellis: Trellis, other_trellis: Trellis): Reference[] {
-  const result = []
+function find_other_references(trellis: Trellis, other_trellis: Trellis): Property[] {
+  const result: any = []
   for (let name in other_trellis.properties) {
     const property = other_trellis.properties [name]
     if (property.is_reference()) {
-      const reference = property as Reference
+      const reference = property
       if (reference.type.get_other_trellis_name() == trellis.name)
         result.push(reference)
     }
@@ -95,7 +90,7 @@ function find_other_references(trellis: Trellis, other_trellis: Trellis): Refere
   return result
 }
 
-function find_other_reference_or_null(trellis: Trellis, other_trellis: Trellis): Reference {
+function find_other_reference_or_null(trellis: Trellis, other_trellis: Trellis): Property {
   const references = find_other_references(trellis, other_trellis)
   if (references.length > 1)
     console.error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".")
@@ -104,7 +99,7 @@ function find_other_reference_or_null(trellis: Trellis, other_trellis: Trellis):
   return references [0]
 }
 
-function find_other_reference(trellis: Trellis, other_trellis: Trellis): Reference {
+function find_other_reference(trellis: Trellis, other_trellis: Trellis): Property {
   const reference = find_other_reference_or_null(trellis, other_trellis)
   if (!reference)
     throw Error("Could not find other reference for " + trellis.name + " and " + other_trellis.name + ".")
@@ -112,22 +107,22 @@ function find_other_reference(trellis: Trellis, other_trellis: Trellis): Referen
   return reference
 }
 
-function load_property_inner(name: string, source: Property_Source, trellis: Trellis, loader: Loader): Property {
+function load_property_inner(name: string, source: PropertySource, trellis: Trellis, loader: Loader): Property {
   if (!source.type)
     throw new Error(trellis.name + "." + name + " is missing a type property.")
 
   const type = load_type(source, loader)
-  if (type.get_category() == Type_Category.primitive) {
+  if (type.get_category() == TypeCategory.primitive) {
     return new StandardProperty(name, type, trellis)
   }
-  else if (type.get_category() == Type_Category.trellis) {
+  else if (type.get_category() == TypeCategory.trellis) {
     return new Reference(name, type, trellis, find_other_reference_or_null(trellis, (type as Trellis_Type).trellis))
   }
-  else if (type.get_category() == Type_Category.list) {
+  else if (type.get_category() == TypeCategory.list) {
     const list_type = type as List_Type
     return new Reference(name, type, trellis, find_other_reference(trellis, (list_type.child_type as Trellis_Type).trellis))
   }
-  else if (type.get_category() == Type_Category.incomplete) {
+  else if (type.get_category() == TypeCategory.incomplete) {
     const property = new Reference(name, type, trellis)
     const target = (type as Incomplete_Type).target_name
     const incomplete = loader.incomplete [target] = loader.incomplete [target] || []
@@ -142,7 +137,7 @@ function load_property_inner(name: string, source: Property_Source, trellis: Tre
   }
 }
 
-function load_property(name: string, property_source: Property_Source, trellis: Trellis, loader: Loader): Property {
+function load_property(name: string, property_source: PropertySource, trellis: Trellis, loader: Loader): Property {
   const property = trellis.properties [name] = load_property_inner(name, property_source, trellis, loader)
   if (property_source.nullable === true)
     property.is_nullable = true
@@ -150,9 +145,17 @@ function load_property(name: string, property_source: Property_Source, trellis: 
   if (property_source.unique === true)
     property.is_unique = true
 
-  property.default = property_source.defaultValue !== undefined
-    ? property_source.defaultValue
-    : property_source.default
+  if (property_source.length)
+    property.length = property_source.length
+
+  if (typeof property_source.autoIncrement === 'boolean')
+    property.autoIncrement = property_source.autoIncrement
+
+  property.default = property.is_nullable
+    ? null
+    : (property_source.defaultValue !== undefined
+      ? property_source.defaultValue
+      : property_source.default)
 
   return property
 }
@@ -164,14 +167,14 @@ function update_incomplete(trellis: Trellis, loader: Loader) {
       const entry = incomplete[i]
       const property = entry.property
       const type = property.type = load_type(entry.source, loader)
-      if (type.get_category() == Type_Category.incomplete)
+      if (type.get_category() == TypeCategory.incomplete)
         throw Error("Error resolving incomplete type.")
 
-      if (type.get_category() == Type_Category.trellis) {
-        (property as Reference).other_property = find_other_reference_or_null(property.trellis, trellis)
+      if (type.get_category() == TypeCategory.trellis) {
+        property.otherProperty = find_other_reference_or_null(property.trellis, trellis)
       }
       else {
-        (property as Reference).other_property = find_other_reference(property.trellis, trellis)
+        property.otherProperty = find_other_reference(property.trellis, trellis)
       }
     }
     delete loader.incomplete[trellis.name]
@@ -202,26 +205,46 @@ function format_primary_keys(primary_keys: any, trellis_name: string) {
   throw new Error("Invalid primary keys format for trellis " + trellis_name + '.')
 }
 
-function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loader: Loader) {
-  const primary_keys = format_primary_keys(source.primary || source.primary_key, trellis.name)
-  for (let i = 0; i < primary_keys.length; ++i) {
-    trellis.primary_keys.push(initialize_primary_key(primary_keys[i], trellis, loader))
+function initialize_primary_keys(trellis: Trellis, source: TrellisSource, loader: Loader) {
+  const initialPrimaryKeys = source.primaryKeys || source.primary || source.primary_key
+  const primaryKeys = format_primary_keys(initialPrimaryKeys, trellis.name)
+  for (let i = 0; i < primaryKeys.length; ++i) {
+    trellis.primary_keys.push(initialize_primary_key(primaryKeys[i], trellis, loader))
   }
-
-  trellis.primary_key = trellis.primary_keys[0]
 }
 
-function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
-  const trellis = new Trellis(name)
+// loadIndexes function returns an array of indexes
+function loadIndexes(source: TrellisSource) {
+  if (!source.table || !source.table.indexes)
+    return []
+
+  return source.table.indexes.map(indexSource =>
+    ({
+      properties: indexSource.properties.map(name => name)
+    })
+  )
+}
+
+function load_trellis(name: string, source: TrellisSource, loader: Loader): Trellis {
+  const sourceTable = source.table || { name: undefined }
+  const table: Table = {
+    name: sourceTable.name || pluralize(snakeCaseTables ? to_lower_snake_case(name) : name.toLowerCase()),
+    // Call loadIndexes function to assign indexes to trellis.table.indexes
+    indexes: loadIndexes(source)
+  }
+  const trellis = new TrellisImplementation(name, table)
   loader.library.types[name] = new Trellis_Type(name, trellis)
 
   for (let name in source.properties) {
     const property_source = source.properties [name]
     trellis.properties [name] = load_property(name, property_source, trellis, loader)
   }
-  
+
   if (source.additional)
     trellis.additional = source.additional
+
+  if (source.softDelete)
+    trellis.softDelete = true
 
   initialize_primary_keys(trellis, source, loader)
   update_incomplete(trellis, loader)
@@ -229,7 +252,7 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
   return trellis
 }
 
-export function load_schema(definitions: Schema_Source, trellises: { [name: string]: Trellis }, library: Library) {
+export function load_schema(definitions: SchemaSource, trellises: { [name: string]: Trellis }, library: LibraryImplementation) {
   const loader = new Loader(library)
 
   for (let name in definitions) {
@@ -243,7 +266,7 @@ export function load_schema(definitions: Schema_Source, trellises: { [name: stri
       if (!trellises[definition.parent])
         throw Error("Invalid parent trellis: " + definition.parent + '.')
 
-      trellises [name].parent = trellises [definition.parent ]
+      trellises [name].parent = trellises [definition.parent]
     }
   }
 

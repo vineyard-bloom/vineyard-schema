@@ -1,6 +1,7 @@
-import {Type, Type_Category, List_Type} from './type'
+import {Types, TypeCategory, List_Type} from './types'
+import {Property, Table, Trellis} from "./types";
 
-export class Trellis_Type extends Type {
+export class Trellis_Type extends Types {
   trellis: Trellis
 
   constructor(name: string, trellis: Trellis) {
@@ -8,8 +9,8 @@ export class Trellis_Type extends Type {
     this.trellis = trellis
   }
 
-  get_category(): Type_Category {
-    return Type_Category.trellis
+  get_category(): TypeCategory {
+    return TypeCategory.trellis
   }
 
   get_other_trellis_name(): string {
@@ -17,30 +18,16 @@ export class Trellis_Type extends Type {
   }
 }
 
-export interface Property {
-  name: string
-  type: Type
-  trellis: Trellis
-  is_nullable: boolean
-  "default": any
-  is_unique: boolean
-
-  get_path(): string
-
-  is_reference(): boolean
-
-  is_list(): boolean
-}
-
 export class StandardProperty implements Property {
   name: string
-  type: Type
+  type: Types
   trellis: Trellis
   is_nullable: boolean = false
   "default": any
   is_unique: boolean = false
+  otherProperty?: Property = undefined
 
-  constructor(name: string, type: Type, trellis: Trellis) {
+  constructor(name: string, type: Types, trellis: Trellis) {
     this.name = name
     this.type = type
     this.trellis = trellis
@@ -51,35 +38,36 @@ export class StandardProperty implements Property {
   }
 
   is_reference(): boolean {
-    return this.type.get_category() == Type_Category.trellis
-      || this.type.get_category() == Type_Category.list
-      || this.type.get_category() == Type_Category.incomplete
+    return this.type.get_category() == TypeCategory.trellis
+      || this.type.get_category() == TypeCategory.list
+      || this.type.get_category() == TypeCategory.incomplete
   }
 
   is_list(): boolean {
-    return this.type.get_category() == Type_Category.list
-  }
-}
-
-export class Reference extends StandardProperty {
-  other_property: Property
-
-  constructor(name: string, type: Type, trellis: Trellis, other_property?: Property) {
-    super(name, type, trellis)
-    if (other_property)
-      this.other_property = other_property
+    return this.type.get_category() == TypeCategory.list
   }
 
   get_other_trellis(): Trellis {
-    return this.type.get_category() == Type_Category.trellis
+    return this.type.get_category() == TypeCategory.trellis
       ? (this.type as Trellis_Type).trellis
       : ((this.type as List_Type).child_type as Trellis_Type).trellis
   }
+
+}
+
+export class Reference extends StandardProperty {
+
+  constructor(name: string, type: Types, trellis: Trellis, other_property?: Property) {
+    super(name, type, trellis)
+    if (other_property)
+      this.otherProperty = other_property
+  }
+
 }
 
 function get_key_identity(data: any, name: string) {
   const id = data[name]
-  if (id)
+  if (id || id === 0)
     return id
 
   if (typeof data === 'object')
@@ -89,27 +77,28 @@ function get_key_identity(data: any, name: string) {
   return data
 }
 
-export interface ITrellis {
-  name: string
-  properties: { [name: string]: Property }
-  primary_keys: Property[]
-  parent?: Trellis | null
-}
+// export interface ITrellis {
+//   name: string
+//   properties: { [name: string]: Property }
+//   primary_keys: Property[]
+//   parent?: Trellis | null
+// }
 
-export class Trellis implements ITrellis {
+export class TrellisImplementation implements Trellis {
+  table: Table
   name: string
   properties: { [name: string]: Property } = {}
   primary_keys: Property[] = []
-  parent: Trellis | null = null
+  parent?: Trellis
+  collection: any
+  softDelete: boolean = false
 
-  // Deprecated
-  primary_key: Property
-
-  private lists: Reference[]
+  private lists: Reference[] = []
   additional: any = {}
 
-  constructor(name: string) {
+  constructor(name: string, table: Table) {
     this.name = name
+    this.table = table
   }
 
   get_lists(): Reference[] {
@@ -148,7 +137,7 @@ export class Trellis implements ITrellis {
   }
 }
 
-export function getIdentity(trellis: ITrellis, data: any) {
+export function getIdentity(trellis: Trellis, data: any) {
   if (!data)
     throw new Error("Identity cannot be empty.")
 

@@ -1,5 +1,5 @@
 export * from './scheming';
-export * from './type';
+export * from './types';
 export * from './library';
 export * from './trellis';
 export * from './loading';
