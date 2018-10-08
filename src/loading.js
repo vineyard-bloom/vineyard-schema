@@ -101,6 +101,8 @@ function load_property(name, property_source, trellis, loader) {
     const property = trellis.properties[name] = load_property_inner(name, property_source, trellis, loader);
     if (property_source.nullable === true)
         property.is_nullable = true;
+    if (property_source.enumValues)
+        property.enumValues = property_source.enumValues;
     if (property_source.unique === true)
         property.is_unique = true;
     if (property_source.length)

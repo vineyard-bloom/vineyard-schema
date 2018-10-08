@@ -142,6 +142,9 @@ function load_property(name: string, property_source: PropertySource, trellis: T
   if (property_source.nullable === true)
     property.is_nullable = true
 
+  if (property_source.enumValues)
+    property.enumValues = property_source.enumValues
+
   if (property_source.unique === true)
     property.is_unique = true
 
