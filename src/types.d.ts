@@ -3,7 +3,7 @@ export declare enum TypeCategory {
     decimal = 1,
     primitive = 2,
     list = 3,
-    trellis = 4,
+    trellis = 4
 }
 export interface Type {
     name: string;
@@ -77,7 +77,7 @@ export interface Property {
     "default": any;
     is_unique: boolean;
     otherProperty?: Property;
-    crossTable?: Trellis;
+    crossTable?: string;
     autoIncrement?: boolean;
     length?: number;
     enumValues?: any[];

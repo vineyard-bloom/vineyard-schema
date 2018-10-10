@@ -69,7 +69,7 @@ class TrellisImplementation {
         this.properties = {};
         this.primary_keys = [];
         this.softDelete = false;
-        this.lists = [];
+        this.lists = undefined;
         this.additional = {};
         this.name = name;
         this.table = table;

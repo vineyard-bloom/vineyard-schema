@@ -33,7 +33,7 @@ export declare class TrellisImplementation implements Trellis {
     parent?: Trellis;
     collection: any;
     softDelete: boolean;
-    private lists;
+    private lists?;
     additional: any;
     constructor(name: string, table: Table);
     get_lists(): Reference[];

@@ -116,7 +116,7 @@ export interface Property {
   "default": any
   is_unique: boolean
   otherProperty?: Property
-  crossTable?: Trellis
+  crossTable?: string
   autoIncrement?: boolean
   length?: number
   enumValues?: any[]

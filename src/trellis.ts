@@ -93,7 +93,7 @@ export class TrellisImplementation implements Trellis {
   collection: any
   softDelete: boolean = false
 
-  private lists: Reference[] = []
+  private lists?: Reference[] = undefined
   additional: any = {}
 
   constructor(name: string, table: Table) {
